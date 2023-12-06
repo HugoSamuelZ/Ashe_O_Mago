@@ -10,9 +10,12 @@ public class Slime_Bombado : MonoBehaviour
     public float distFinal = 2f;
     private SpriteRenderer ImagemSlime;
     public Animator anim;
+    private Transform posicaoDoJogador;
+    public float velocidadeDoInimigo;
 
     void Start()
     {
+        posicaoDoJogador = GameObject.FindGameObjectWithTag("Jogador_Principal").transform;
         ImagemSlime = GetComponent<SpriteRenderer>();
         anim = GetComponent<Animator>();
     }
@@ -20,9 +23,10 @@ public class Slime_Bombado : MonoBehaviour
 
     void Update()
     {
-
+        SeguirJogador();
         Andar();
     }
+
 
     void Andar()
     {
@@ -42,6 +46,22 @@ public class Slime_Bombado : MonoBehaviour
         }
     }
 
+    private void SeguirJogador()
+    {
+        if (posicaoDoJogador.gameObject != null)
+        {
+            float distance = Vector2.Distance(transform.position, posicaoDoJogador.position);
+            if (distance > 1 && distance < 4)
+            {
+                transform.position = Vector2.MoveTowards(transform.position, posicaoDoJogador.position, velocidadeDoInimigo * Time.deltaTime);
+            }
+            else if (distance <= 1) 
+            {
+                anim.SetTrigger("atk");
+            }
+        }
+
+    }
 
     ///Danos
 
@@ -54,17 +74,25 @@ public class Slime_Bombado : MonoBehaviour
 
 
             hp--;
-
             if (hp <= 0)
             {
+             
+
                 Destroy(this.gameObject);
+               
 
             }
 
-
-
         }
+        if (colisao.gameObject.tag == "Jogador_Principal")
 
 
+            hp--;
+        if (hp <= 0)
+
+        {
+            Destroy(this.gameObject);
+        }
     }
 }
+

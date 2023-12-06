@@ -81,11 +81,7 @@ public class Slime_Morcego : MonoBehaviour
 
         }
         if (colisao.gameObject.tag == "Jogador_Principal")
-            
-            
-            hp--;
-            if (hp <= 0)
-
+           
             {
             Destroy(this.gameObject);
             }

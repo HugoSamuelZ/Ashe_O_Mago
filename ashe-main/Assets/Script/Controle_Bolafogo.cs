@@ -39,6 +39,28 @@ public class Controle_Bolafogo : MonoBehaviour
         {
             Destroy(this.gameObject);
         }
+
+        if (colisao.gameObject.tag == "Dano_Roxo_tag")
+        {
+            Destroy(this.gameObject);
+        }
+
+        if (colisao.gameObject.tag == "Dano_Bombado_tag")
+        {
+            Destroy(this.gameObject);
+        }
+
+        if (colisao.gameObject.tag == "Dano_Morcego_tag")
+        {
+            Destroy(this.gameObject);
+        }
+
+        if (colisao.gameObject.tag == "Boss")
+        {
+            Destroy(this.gameObject);
+        }
+
+
         if (colisao.gameObject.tag == "chão")
         {
             Destroy(this.gameObject);

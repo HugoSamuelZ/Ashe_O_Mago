@@ -50,4 +50,11 @@ public class gerenciamentojogo : MonoBehaviour
     {
         SceneManager.LoadScene(0);
     }
+
+    public void SairDoJogo()
+    {
+        Debug.Log("Saiu do jogo");
+        Application.Quit();
+    }
+
 }

@@ -29,6 +29,7 @@ public class Player : MonoBehaviour
 
     //VIDA DO PERSONAGEM
     public int vida = 10;
+    int vidamax;
     private float meuTempoDano = 0;
     private bool pode_dano = true;
 
@@ -62,6 +63,8 @@ public class Player : MonoBehaviour
 
     private gerenciamentojogo GJ;
 
+    public bool ataque_forteativado=false;
+
 
     //A primeira ação vista ao começar o jogo
     void Start()
@@ -70,12 +73,12 @@ public class Player : MonoBehaviour
 
         //Mudo a posição do personagem
 
-
+        vidamax = vida;
         GJ = GameObject.FindGameObjectWithTag("GameController").GetComponent<gerenciamentojogo>();
         BarraDeHP = GameObject.FindGameObjectWithTag("barra_de_hp").GetComponent<Image>();
         anim = GetComponent<Animator>();
         Chances_Texto = GameObject.FindGameObjectWithTag("Chance_Texto_tag").GetComponent<Text>();
-        Chances_Texto.text = "VIDAS: " + chances.ToString();
+        Chances_Texto.text =  ": " +  chances.ToString();
     }
 
 
@@ -198,7 +201,12 @@ public class Player : MonoBehaviour
 
         }
 
-       
+        if (gatilho.gameObject.tag == "cajado")
+        {
+            Destroy(gatilho.gameObject);
+            ataque_forteativado = true;
+
+        }
 
         if (gatilho.gameObject.tag == "morte_imediata")
         {
@@ -217,13 +225,31 @@ public class Player : MonoBehaviour
             Destroy(gatilho.gameObject);
             Orbs++;
         }
+       
         
         
         if (gatilho.gameObject.tag == "potion")
         {
             Destroy(gatilho.gameObject);
-            vida++;
+            if (vida < vidamax)
+            {
+                
+                vida++;
+                if (vida > vidamax) 
+                {
+                    vida = vidamax;
+                }
+            }
+            PerderHp();
+
         }
+
+        if (gatilho.gameObject.tag == "bala")
+        {
+            TomarDano(1);
+            Destroy(gatilho.gameObject);
+        }
+
     }
 
 
@@ -236,12 +262,23 @@ public class Player : MonoBehaviour
             {
                 cooldown = false;
                 castada();
-                anim.SetBool("Platack", true);
+                if (ataque_forteativado == true)
+                {
+                    anim.SetBool("Platackforte", true);
+                }
+                else
+                {
+                    anim.SetBool("Platack", true);
+
+                }
+
+                
             }
             else
             {
                 TemporarizadorFogo();
                 anim.SetBool("Platack", false);
+                anim.SetBool("Platackforte", false);
             }
 
         }
@@ -257,7 +294,7 @@ public class Player : MonoBehaviour
         {
             // direcao ------>
             //posição que o fogo sai
-            Vector3 pontodeCast = new Vector3(transform.position.x + 0.4f, transform.position.y + 0.8f, transform.position.z);
+            Vector3 pontodeCast = new Vector3(transform.position.x + 0.5f, transform.position.y + 0.1f, transform.position.z);
             GameObject castfogo = Instantiate(fogo, pontodeCast, Quaternion.identity);
             castfogo.GetComponent<Controle_Bolafogo>().direcaofogo(0.03f);
 
@@ -269,7 +306,7 @@ public class Player : MonoBehaviour
         {
             // direcao <------
             //posição que o fogo sai
-            Vector3 pontodeCast = new Vector3(transform.position.x - 0.4f, transform.position.y + 0.8f, transform.position.z);
+            Vector3 pontodeCast = new Vector3(transform.position.x - 0.5f, transform.position.y + 0.1f, transform.position.z);
             GameObject castfogo = Instantiate(fogo2, pontodeCast, Quaternion.identity);
             castfogo.GetComponent<Controle_Bolafogo>().direcaofogo(-0.03f);
 
@@ -324,14 +361,14 @@ public class Player : MonoBehaviour
             TomarDano(1);
         }
 
-        
+
         //JOGADOR TOMA DANO DO SLIME ROXO
         if (colisao.gameObject.tag == "Dano_Roxo_tag")
         {
             TomarDano(2);
         }
 
-       
+
         //JOGADOR TOMA DANO DO SLIME MORCEGO
         if (colisao.gameObject.tag == "Dano_Morcego_tag")
         {
@@ -343,6 +380,14 @@ public class Player : MonoBehaviour
             TomarDano(3);
         }
 
+        if (colisao.gameObject.tag == "bala")
+        {
+            TomarDano(1);
+            Destroy(colisao.gameObject);
+        }
+
+
+
 
 
         //JOGADOR PEGA AS BANDEIRAS DE CHECKPOINT
@@ -351,9 +396,12 @@ public class Player : MonoBehaviour
             posInicial = colisao.gameObject.transform.position;
             Destroy(colisao.gameObject);
         }
+    
 
 
     }
+
+   
 
 
     void TomarDano(int dano)
@@ -361,6 +409,7 @@ public class Player : MonoBehaviour
         if (pode_dano == true)
         {
 
+            
             vida = vida - dano;
             PerderHp();
             pode_dano = false;
@@ -373,6 +422,10 @@ public class Player : MonoBehaviour
         if (vida <= 0)
         {
             anim.SetBool("Pmorte", true);
+        }
+        else
+        {
+            anim.SetBool("Pmorte", false);
         }
         
             
@@ -387,8 +440,9 @@ public class Player : MonoBehaviour
 
     void PerderHp()
     {
-        int vida_parabarra = vida * 6;
-        BarraDeHP.rectTransform.sizeDelta = new Vector2(vida_parabarra, 15);
+        BarraDeHP.fillAmount = (float)vida / vidamax;
+        //int vida_parabarra = vida * 10;
+        //BarraDeHP.rectTransform.sizeDelta = new Vector2(vida_parabarra, 15);
     }
 
     //PERSONAGEM VAI DE BASE
@@ -397,7 +451,7 @@ public class Player : MonoBehaviour
 
     {
         chances--;
-        Chances_Texto.text = "VIDAS: " + chances.ToString();
+        Chances_Texto.text = ": " + chances.ToString();
 
         //só reinicia se acabar as chances
         if (chances <= 0)
@@ -415,17 +469,25 @@ public class Player : MonoBehaviour
     {
         //Mudo a posição do personagem
         transform.position = posInicial;
-
+        
         //recuperar Vida
-        vida = 6;
-        int vida_parabarra = vida * 6;
-        BarraDeHP.rectTransform.sizeDelta = new Vector2(vida_parabarra, 15);
+        vida = vidamax;
+        //int vida_parabarra = vida * 6;
+        //BarraDeHP.rectTransform.sizeDelta = new Vector2(vida_parabarra, 15);
+        BarraDeHP.fillAmount = 1;
+        anim.SetBool("Pmorte", false);
+        anim.SetTrigger("Previve");
     }
 
     //Reinicia o jogo
 
    
+    
+    
+        
 
+          
+    
 
 
 

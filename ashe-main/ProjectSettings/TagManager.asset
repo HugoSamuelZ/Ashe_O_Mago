@@ -19,6 +19,9 @@ TagManager:
   - Dano_Bombado_tag
   - Orb
   - potion
+  - Boss
+  - bala
+  - cajado
   layers:
   - Default
   - TransparentFX

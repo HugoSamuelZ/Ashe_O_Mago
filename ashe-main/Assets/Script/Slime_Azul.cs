@@ -10,6 +10,7 @@ public class Slime_Azul : MonoBehaviour
     public float distFinal = 2f;
     private SpriteRenderer ImagemSlime;
     public Animator anim;
+    private bool vivo=true;
 
     void Start()
     {
@@ -20,8 +21,11 @@ public class Slime_Azul : MonoBehaviour
 
     void Update()
     {
-
-        Andar();
+        if (vivo == true)
+        {
+            Andar();
+        }
+        
     }
 
     void Andar()
@@ -51,20 +55,34 @@ public class Slime_Azul : MonoBehaviour
 
         if (colisao.gameObject.tag == "Fogo")
         {
-
-
             hp--;
             
+
             if (hp <= 0)
+                
             {
-                Destroy(this.gameObject);
+
+                anim.SetTrigger("SlAmorte");
+                vivo = false;
+                GetComponent<Rigidbody2D>().gravityScale = 0;
+                GetComponent<BoxCollider2D>().enabled = false;
+
 
             }
 
-           
-                
+            
+            
+
         }
 
         
     }
+
+
+
+    public void Morrer()
+    {
+ Destroy(this.gameObject);
+    }
+
 }
